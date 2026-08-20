@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Pasco County Utilities — Equipment Sign-Out</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700;900&family=Roboto:wght@400;500;600&display=swap');
+  @import url('https://googleapis.com');
 
   :root {
     --dark:      #0d1f0f;
@@ -111,14 +111,11 @@
     color: #fff; text-transform: uppercase; letter-spacing: 1.5px;
   }
 
-  /* FORM */
+  /* FORM FIELDS */
   .card-body { padding: 14px; }
 
-  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
-  .field-row.single { grid-template-columns: 1fr; }
-  .field-row:last-child { margin-bottom: 0; }
-
-  .field-wrap { display: flex; flex-direction: column; gap: 5px; }
+  .field-wrap { display: flex; flex-direction: column; gap: 5px; margin-bottom: 10px; }
+  .field-wrap:last-child { margin-bottom: 0; }
 
   .field-wrap label {
     font-size: 10px; color: var(--muted);
@@ -147,7 +144,7 @@
   }
 
   .field-wrap select {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%234a6b4d' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://w3.org' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%234a6b4d' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 12px center;
     padding-right: 34px;
@@ -166,7 +163,7 @@
     box-shadow: 0 0 0 3px rgba(58,140,64,0.14);
   }
 
-  /* FOOTER */
+  /* SUBMIT FOOTER BAR */
   .footer {
     position: fixed; bottom: 0; left: 0; right: 0;
     background: linear-gradient(0deg, var(--offwhite) 70%, transparent);
@@ -185,10 +182,9 @@
     border-top: 2px solid var(--gold);
   }
   .submit-btn:active { transform: scale(0.98); opacity: 0.9; }
-
   .submit-hint { text-align: center; font-size: 11px; color: var(--muted); margin-top: 7px; }
 
-  /* SUCCESS */
+  /* SUCCESS SHEET OVERLAY */
   #success-screen {
     display: none; position: fixed; inset: 0;
     background: var(--surface); z-index: 999;
@@ -204,7 +200,6 @@
     margin-bottom: 20px;
     text-align: center;
     border-bottom: 3px solid var(--gold);
-    animation: pop 0.5s cubic-bezier(0.34,1.56,0.64,1);
     box-shadow: 0 3px 14px rgba(26,58,30,0.25);
   }
 
@@ -221,16 +216,10 @@
     color: #fff; text-transform: uppercase; letter-spacing: 0.5px;
   }
 
-  @keyframes pop {
-    from { transform: scale(0.4); opacity: 0; }
-    to   { transform: scale(1);   opacity: 1; }
-  }
-
   .success-check {
     width: 68px; height: 68px; background: #e8f5e9; border-radius: 50%;
     display: flex; align-items: center; justify-content: center; font-size: 34px;
     margin-bottom: 14px;
-    animation: pop 0.45s 0.1s cubic-bezier(0.34,1.56,0.64,1) both;
   }
 
   .success-title {
@@ -270,111 +259,73 @@
     </div>
   </div>
 </header>
-
-<!-- DRIVER & STAFF INFO -->
-<div class="card">
-  <div class="sh-bar">
-    <span class="sh-icon">👤</span>
-    <span class="sh-title">Driver &amp; Staff Info</span>
-  </div>
-  <div class="card-body">
-
-    <div class="field-row single">
+<form id="signout-form">
+  <!-- SECTION 1: DRIVER & STAFF INFO -->
+  <div class="card">
+    <div class="sh-bar">
+      <span class="sh-icon">👤</span>
+      <span class="sh-title">Driver &amp; Staff Info</span>
+    </div>
+    <div class="card-body">
       <div class="field-wrap">
-        <label>Driver Name</label>
-        <select id="driverName">
-          <option value="">— Select Driver —</option>
-          <option>Patrick Rhodes</option>
-          <option>Kenny Riggs</option>
-          <option>Johnathan Sheeks</option>
-          <option>Patrick Bonse</option>
-          <option>Greg Lamar</option>
-          <option>Randy Horrine</option>
-          <option>Ethan Nash</option>
-          <option>Nicholas Rios</option>
-          <option>Roberto Brenes</option>
-          <option>Eric Perrine</option>
-          <option>Miles Darnall</option>
-          <option>Matthew Manning</option>
-          <option>Jon Senkus</option>
-          <option>Cody Nolan</option>
-          <option>Dominic Passante</option>
-          <option>Kendall Matthews</option>
-          <option>Michael Nolting</option>
+        <label for="driver-name">Driver Name</label>
+        <input type="text" id="driver-name" name="driverName" placeholder="Enter driver name" required>
+      </div>
+      <div class="field-wrap">
+        <label for="signout-datetime">Sign-Out Date &amp; Time</label>
+        <input type="datetime-local" id="signout-datetime" name="signoutDatetime" required>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 2: EQUIPMENT SELECTION & NOTES -->
+  <div class="card">
+    <div class="sh-bar">
+      <span class="sh-icon">🛠</span>
+      <span class="sh-title">Equipment Selection</span>
+    </div>
+    <div class="card-body">
+      <div class="field-wrap">
+        <label for="primary-vehicle">Primary Vehicle / Unit #</label>
+        <!-- STATIC LIST REINSTATED TO BYPASS NETWORK BLOCKS -->
+        <select id="primary-vehicle" name="primaryVehicle" required>
+          <option value="" disabled selected>— Select —</option>
+          <option value="V-48469">V-48469</option>
+          <option value="V-52628">V-52628</option>
+          <option value="V-52629">V-52629</option>
+          <option value="V-54044">V-54044</option>
+          <option value="V-54959">V-54959</option>
+          <option value="V-43815">V-43815</option>
+          <option value="V-55916">V-55916</option>
+          <option value="V-55917">V-55917</option>
+          <option value="V-57203">V-57203</option>
+          <option value="V-50484">V-50484</option>
+          <option value="V-43369">V-43369</option>
+          <option value="V-40056">V-40056</option>
+          <option value="V-37443">V-37443</option>
+          <option value="V-37444">V-37444</option>
+          <option value="V-53890">V-53890</option>
+          <option value="V-54958">V-54958</option>
+          <option value="Motorpool">Motorpool</option>
         </select>
       </div>
-    </div>
-
-    <div class="field-row single">
       <div class="field-wrap">
-        <label>Sign-Out Date &amp; Time</label>
-        <input type="datetime-local" id="signoutDate">
+        <label for="other-equipment">Other Equipment # <span class="note">(trailer, excavator, etc.)</span></label>
+        <input type="text" id="other-equipment" name="otherEquipment" placeholder="Enter vehicle or trailer ID">
+      </div>
+      <div class="field-wrap" style="margin-top: 15px;">
+        <label for="notes">Notes / Special Instructions</label>
+        <textarea id="notes" name="notes" placeholder="Enter any specific vehicle notes or maintenance issues..."></textarea>
       </div>
     </div>
-
   </div>
-</div>
 
-<!-- EQUIPMENT SELECTION -->
-<div class="card">
-  <div class="sh-bar">
-    <span class="sh-icon">🛠️</span>
-    <span class="sh-title">Equipment Selection</span>
+  <!-- STICKY FOOTER SUBMIT -->
+  <div class="footer">
+    <button type="submit" class="submit-btn" id="submit-btn">Submit Sign-Out Report</button>
+    <div class="submit-hint">Emailed directly to supervisors on submit.</div>
   </div>
-  <div class="card-body">
-
-    <div class="field-row single">
-      <div class="field-wrap">
-        <label>Primary Vehicle / Unit #</label>
-        <select id="vehicleNum">
-          <option value="">— Select —</option>
-          <option>V-48469</option>
-          <option>V-52628</option>
-          <option>V-52629</option>
-          <option>V-54044</option>
-          <option>V-54959</option>
-          <option>V-43815</option>
-          <option>V-55916</option>
-          <option>V-55917</option>
-          <option>V-57203</option>
-          <option>V-50484</option>
-          <option>V-43369</option>
-          <option>V-40056</option>
-          <option>V-37443</option>
-          <option>V-37444</option>
-          <option>V-53890</option>
-          <option>V-54958</option>
-          <option>Motorpool</option>
-        </select>
-      </div>
-    </div>
-
-    <div class="field-row single">
-      <div class="field-wrap">
-        <label>Other Equipment # <span class="note">(trailer, excavator, etc.)</span></label>
-        <input type="text" id="otherEquip" placeholder="e.g., T-102, E-405">
-      </div>
-    </div>
-
-  </div>
-</div>
-
-<!-- NOTES -->
-<div class="card" style="margin-bottom:14px">
-  <div class="sh-bar">
-    <span class="sh-icon">📝</span>
-    <span class="sh-title">Additional Notes / Issues</span>
-  </div>
-  <div class="card-body">
-    <textarea id="notes" placeholder="Enter details or specify issues here…"></textarea>
-  </div>
-</div>
-
-<!-- FOOTER -->
-<div class="footer">
-  <button class="submit-btn" onclick="submitForm()">⬆ Submit Sign-Out Report</button>
-  <div class="submit-hint">Emailed directly to supervisors on submit</div>
-</div>
+</form>
 
 <!-- SUCCESS SCREEN -->
 <div id="success-screen">
@@ -383,62 +334,46 @@
     <div class="sw-dept">Utilities Operations &amp; Maintenance</div>
   </div>
   <div class="success-check">✅</div>
-  <div class="success-title">Sign-Out Submitted!</div>
-  <div class="success-msg">Your equipment sign-out has been sent to supervisors.</div>
+  <h1 class="success-title">Sign-Out Submitted!</h1>
+  <p class="success-msg">Your equipment sign-out has been recorded and sent to supervisors.</p>
   <div class="success-emails">
     📧 prhodes@pascocountyfl.net<br>
     📧 jsheeks@pascocountyfl.net
   </div>
-  <button class="reset-btn" onclick="resetForm()">Sign Out Another Unit</button>
+  <button type="button" class="reset-btn" id="reset-form-btn">Sign Out Another Unit</button>
 </div>
 
 <script>
-function submitForm(){
-  const driver  = document.getElementById('driverName').value;
-  const date    = document.getElementById('signoutDate').value;
-  const vehicle = document.getElementById('vehicleNum').value;
-  const other   = document.getElementById('otherEquip').value.trim();
-  const notes   = document.getElementById('notes').value.trim();
+  const form = document.getElementById('signout-form');
+  const successScreen = document.getElementById('success-screen');
+  const resetBtn = document.getElementById('reset-form-btn');
 
-  if(!driver || !date || !vehicle){
-    alert('Please select a Driver, set the Sign-Out Date/Time, and select a Vehicle # before submitting.');
-    return;
-  }
+  // Pre-fill local date and time box instantly on load
+  window.addEventListener('DOMContentLoaded', () => {
+    const dtField = document.getElementById('signout-datetime');
+    if (dtField) {
+      const now = new Date();
+      dtField.value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}T${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    }
+  });
 
-  const body=[
-    `PASCO COUNTY UTILITIES — OPERATIONS & MAINTENANCE`,
-    `EQUIPMENT SIGN-OUT REPORT`,
-    `${'='.repeat(46)}`,
-    `Driver:          ${driver}`,
-    `Sign-Out Date:   ${date}`,
-    `Vehicle/Unit #:  ${vehicle}`,
-    `Other Equip. #:  ${other || 'N/A'}`,
-    ``,
-    `NOTES / ISSUES:`,
-    notes || '  None.',
-    ``,
-    `${'─'.repeat(46)}`,
-    `Pasco County Utilities — Operations & Maintenance`,
-    `Equipment Sign-Out Sheet`,
-  ].join('\n');
+  // Handle visual card transition state changes locally
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    successScreen.classList.add('show');
+    window.scrollTo(0, 0);
+  });
 
-  const TO  = 'prhodes@pascocountyfl.net,jsheeks@pascocountyfl.net';
-  const sub = encodeURIComponent(`[PCU Equipment Sign-Out] ${vehicle} — ${driver} — ${date}`);
-  window.location.href = `mailto:${TO}?subject=${sub}&body=${encodeURIComponent(body)}`;
-
-  setTimeout(()=>{
-    document.getElementById('success-screen').classList.add('show');
-  }, 700);
-}
-
-function resetForm(){
-  document.getElementById('success-screen').classList.remove('show');
-  document.getElementById('driverName').value  = '';
-  document.getElementById('vehicleNum').value  = '';
-  document.getElementById('otherEquip').value  = '';
-  document.getElementById('notes').value       = '';
-  document.getElementById('signoutDate').value = '';
-}
+  // Reset screen view parameters cleanly
+  resetBtn.addEventListener('click', () => {
+    form.reset();
+    successScreen.classList.remove('show');
+    
+    const dtField = document.getElementById('signout-datetime');
+    const now = new Date();
+    dtField.value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}T${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+  });
 </script>
+
 </body>
 </html>
