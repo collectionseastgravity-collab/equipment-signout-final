@@ -21,21 +21,24 @@ export default {
       });
     }
 
-    // ⚠️ UPDATE THESE CONFIGURATIONS TO MATCH YOUR AIRTABLE SETUP
-const AIRTABLE_BASE_ID = "appbY4OMv1cgq3WqH"; 
+    // ⚠️ UPDATE ONLY YOUR BASE ID HERE
+    const AIRTABLE_BASE_ID = "appbY4OMv1cgq3WqH"; 
 
     try {
-      // 1. Figure out which table to use based on the path requested by your HTML
+      // 1. Convert the URL path to lowercase to match safely
+      const requestUrl = request.url.toLowerCase();
       let tableName = "";
-      if (request.url.includes("/available")) {
-        tableName = "Inventory"; // Matches your first tab exactly
-      } else if (request.url.includes("/signedout")) {
-        tableName = "Logs"; // Matches your second tab exactly
+      
+      if (requestUrl.includes("available")) {
+        tableName = "Inventory"; 
+      } else if (requestUrl.includes("signedout")) {
+        tableName = "Logs"; 
       } else {
-        tableName = "Inventory"; // Fallback tab name
+        tableName = "Inventory"; // Fallback if no matching path is found
       }
 
-      url = `https://airtable.com{AIRTABLE_BASE_ID}/${encodeURIComponent(tableName)}`;
+      // 2. Properly structured Airtable API v0 URL endpoint
+      const url = `https://airtable.com{AIRTABLE_BASE_ID}/${encodeURIComponent(tableName)}`;
 
       // --- HANDLE LOADING DATA (GET REQUEST) ---
       if (request.method === "GET") {
