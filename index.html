@@ -6,7 +6,7 @@
 <title>Pasco County Utilities — Equipment Sign-Out</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700;900&family=Roboto:wght@400;500;600&display=swap');
-
+ 
   :root {
     --dark: #0d1f0f; --forest: #1a3a1e; --pine: #245228; --moss: #2e6b33;
     --green: #3a8c40; --leaf: #4caf50; --mint: #66bb6a; --lime-acc: #8bc34a;
@@ -16,7 +16,7 @@
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: var(--offwhite); color: var(--text); font-family: 'Roboto', sans-serif; min-height: 100vh; padding-bottom: 110px; }
-
+ 
   header { background: linear-gradient(160deg, var(--dark) 0%, var(--forest) 50%, var(--pine) 100%); position: sticky; top: 0; z-index: 100; box-shadow: 0 3px 16px rgba(0,0,0,0.35); }
   .header-stripe { height: 4px; background: linear-gradient(90deg, var(--gold) 0%, var(--lime-acc) 50%, var(--gold) 100%); }
   .header-top { display: flex; align-items: center; gap: 12px; padding: 14px 14px 12px; }
@@ -25,17 +25,17 @@
   .header-title { font-family: 'Roboto Condensed', sans-serif; font-size: 22px; font-weight: 900; color: #fff; text-transform: uppercase; letter-spacing: 0.5px; line-height: 1.1; }
   .header-sub { font-size: 11px; color: var(--mint); font-weight: 500; letter-spacing: 0.3px; margin-top: 3px; display: flex; align-items: center; gap: 5px; }
   .header-sub::before { content: ''; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--lime-acc); }
-
+ 
   /* MODE TOGGLE */
   .mode-toggle { display: flex; margin: 14px 12px 0; background: var(--surface2); border-radius: 10px; padding: 4px; border: 1px solid var(--border); }
   .mode-btn { flex: 1; text-align: center; padding: 10px; border: none; background: transparent; border-radius: 7px; font-family: 'Roboto Condensed', sans-serif; font-weight: 700; font-size: 13px; letter-spacing: 0.5px; text-transform: uppercase; color: var(--muted); cursor: pointer; transition: all 0.15s; }
   .mode-btn.active { background: linear-gradient(135deg, var(--pine), var(--moss)); color: #fff; box-shadow: 0 2px 6px rgba(26,58,30,0.3); }
-
+ 
   .card { margin: 14px 12px 10px; background: var(--surface); border-radius: 10px; border: 1px solid var(--border); overflow: hidden; box-shadow: 0 1px 5px rgba(0,0,0,0.07); }
   .sh-bar { background: linear-gradient(90deg, var(--pine), var(--moss)); padding: 9px 14px; display: flex; align-items: center; gap: 8px; border-bottom: 2px solid var(--gold); }
   .sh-bar .sh-icon { font-size: 15px; line-height: 1; }
   .sh-bar .sh-title { font-family: 'Roboto Condensed', sans-serif; font-size: 12px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 1.5px; }
-
+ 
   .card-body { padding: 14px; }
   .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
   .field-row.single { grid-template-columns: 1fr; }
@@ -55,7 +55,7 @@
   .field-wrap textarea { min-height: 90px; resize: vertical; font-size: 14px; }
   .field-wrap input:focus, .field-wrap select:focus, .field-wrap textarea:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(58,140,64,0.14); }
   .field-hint { font-size: 11px; color: var(--muted); margin-top: 2px; }
-
+ 
   .footer { position: fixed; bottom: 0; left: 0; right: 0; background: linear-gradient(0deg, var(--offwhite) 70%, transparent); padding: 12px 12px 18px; z-index: 200; }
   .submit-btn {
     width: 100%; padding: 15px; background: linear-gradient(135deg, var(--pine), var(--moss), var(--green));
@@ -67,7 +67,7 @@
   .submit-btn:disabled { opacity: 0.6; }
   .submit-btn:active:not(:disabled) { transform: scale(0.98); opacity: 0.9; }
   .submit-hint { text-align: center; font-size: 11px; color: var(--muted); margin-top: 7px; }
-
+ 
   #success-screen { display: none; position: fixed; inset: 0; background: var(--surface); z-index: 999; align-items: center; justify-content: center; flex-direction: column; text-align: center; padding: 28px; }
   #success-screen.show { display: flex; }
   .success-wordmark { background: linear-gradient(135deg, var(--pine), var(--moss)); border-radius: 12px; padding: 14px 22px; margin-bottom: 20px; text-align: center; border-bottom: 3px solid var(--gold); animation: pop 0.5s cubic-bezier(0.34,1.56,0.64,1); box-shadow: 0 3px 14px rgba(26,58,30,0.25); }
@@ -78,15 +78,15 @@
   .success-title { font-family: 'Roboto Condensed', sans-serif; font-size: 24px; font-weight: 900; color: var(--pine); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
   .success-msg { color: var(--muted); font-size: 14px; line-height: 1.5; max-width: 280px; margin: 0 auto 14px; }
   .reset-btn { background: linear-gradient(135deg, var(--pine), var(--moss)); border: none; border-radius: 9px; color: #fff; cursor: pointer; font-family: 'Roboto Condensed', sans-serif; font-size: 16px; font-weight: 700; padding: 13px 28px; text-transform: uppercase; letter-spacing: 1px; }
-
+ 
   .error-banner { margin: 0 12px; padding: 10px 14px; background: var(--red-bg); border: 1px solid var(--red); color: var(--red); border-radius: 8px; font-size: 13px; display: none; }
   .error-banner.show { display: block; }
-
+ 
   .loading-note { text-align: center; font-size: 12px; color: var(--muted); padding: 6px 0; }
 </style>
 </head>
 <body>
-
+ 
 <header>
   <div class="header-stripe"></div>
   <div class="header-top">
@@ -97,14 +97,14 @@
     </div>
   </div>
 </header>
-
+ 
 <div class="mode-toggle">
   <button class="mode-btn active" id="btnSignOut" onclick="setMode('signout')">Sign Out</button>
   <button class="mode-btn" id="btnReturn" onclick="setMode('return')">Return</button>
 </div>
-
+ 
 <div class="error-banner" id="errorBanner"></div>
-
+ 
 <!-- SIGN OUT VIEW -->
 <div id="view-signout">
   <div class="card">
@@ -129,7 +129,7 @@
       </div>
     </div>
   </div>
-
+ 
   <div class="card">
     <div class="sh-bar"><span class="sh-icon">🛠️</span><span class="sh-title">Equipment Selection</span></div>
     <div class="card-body">
@@ -145,13 +145,13 @@
       </div>
     </div>
   </div>
-
+ 
   <div class="card" style="margin-bottom:14px">
     <div class="sh-bar"><span class="sh-icon">📝</span><span class="sh-title">Additional Notes / Issues</span></div>
     <div class="card-body"><textarea id="notes" placeholder="Enter details or specify issues here…"></textarea></div>
   </div>
 </div>
-
+ 
 <!-- RETURN VIEW -->
 <div id="view-return" style="display:none">
   <div class="card">
@@ -173,12 +173,12 @@
     <div class="card-body"><textarea id="returnNotes" placeholder="Any issues, damage, or notes on return…"></textarea></div>
   </div>
 </div>
-
+ 
 <div class="footer">
   <button class="submit-btn" id="submitBtn" onclick="submitForm()">⬆ Submit Sign-Out Report</button>
   <div class="submit-hint" id="submitHint">Synced live to the equipment tracker</div>
 </div>
-
+ 
 <div id="success-screen">
   <div class="success-wordmark"><div class="sw-county">Pasco County</div><div class="sw-dept">Utilities Operations &amp; Maintenance</div></div>
   <div class="success-check">✅</div>
@@ -186,13 +186,13 @@
   <div class="success-msg" id="successMsg">Your equipment sign-out has been recorded.</div>
   <button class="reset-btn" onclick="resetForm()">Done</button>
 </div>
-
+ 
 <script>
   // ⚠️ Replace with your deployed Cloudflare Worker URL (no trailing slash)
-  const WORKER_URL = "https://equipment-signout-worker.collectionseastgravity.workers.dev";
-
+  const WORKER_URL = "https://equipment-signout-backend.collectionseastgravity.workers.dev";
+ 
   let mode = "signout";
-
+ 
   function setMode(m){
     mode = m;
     document.getElementById('btnSignOut').classList.toggle('active', m === 'signout');
@@ -204,7 +204,7 @@
     hideError();
     if (m === 'signout') loadAvailable(); else loadSignedOut();
   }
-
+ 
   function showError(msg){
     const el = document.getElementById('errorBanner');
     el.textContent = msg;
@@ -213,7 +213,7 @@
   function hideError(){
     document.getElementById('errorBanner').classList.remove('show');
   }
-
+ 
   async function loadAvailable(){
     const sel = document.getElementById('vehicleNum');
     sel.innerHTML = '<option value="">— Loading available units… —</option>';
@@ -229,7 +229,7 @@
       showError('Could not load available units: ' + e.message);
     }
   }
-
+ 
   async function loadSignedOut(){
     const sel = document.getElementById('returnVehicleNum');
     sel.innerHTML = '<option value="">— Loading signed-out units… —</option>';
@@ -244,23 +244,23 @@
       showError('Could not load signed-out units: ' + e.message);
     }
   }
-
+ 
   async function submitForm(){
     hideError();
     const btn = document.getElementById('submitBtn');
-
+ 
     if (mode === 'signout'){
       const driver  = document.getElementById('driverName').value;
       const date    = document.getElementById('signoutDate').value;
       const vehicle = document.getElementById('vehicleNum').value;
       const other   = document.getElementById('otherEquip').value.trim();
       const notes   = document.getElementById('notes').value.trim();
-
+ 
       if(!driver || !date || !vehicle){
         showError('Please select a Driver, set the Sign-Out Date/Time, and select a Vehicle #.');
         return;
       }
-
+ 
       btn.disabled = true; btn.textContent = 'Submitting…';
       try {
         const res = await fetch(`${WORKER_URL}/signout`, {
@@ -270,7 +270,7 @@
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Submission failed');
-
+ 
         document.getElementById('successTitle').textContent = 'Sign-Out Submitted!';
         document.getElementById('successMsg').textContent = `${vehicle} is now marked Out to ${driver}.`;
         document.getElementById('success-screen').classList.add('show');
@@ -279,17 +279,17 @@
       } finally {
         btn.disabled = false; btn.textContent = '⬆ Submit Sign-Out Report';
       }
-
+ 
     } else {
       const vehicle = document.getElementById('returnVehicleNum').value;
       const driver  = document.getElementById('returnDriver').value.trim();
       const notes   = document.getElementById('returnNotes').value.trim();
-
+ 
       if(!vehicle){
         showError('Please select which vehicle is being returned.');
         return;
       }
-
+ 
       btn.disabled = true; btn.textContent = 'Submitting…';
       try {
         const res = await fetch(`${WORKER_URL}/return`, {
@@ -299,7 +299,7 @@
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Submission failed');
-
+ 
         document.getElementById('successTitle').textContent = 'Return Recorded!';
         document.getElementById('successMsg').textContent = `${vehicle} is now marked Available.`;
         document.getElementById('success-screen').classList.add('show');
@@ -310,7 +310,7 @@
       }
     }
   }
-
+ 
   function resetForm(){
     document.getElementById('success-screen').classList.remove('show');
     document.getElementById('driverName').value = '';
@@ -321,9 +321,10 @@
     document.getElementById('returnNotes').value = '';
     setMode(mode); // reload live lists
   }
-
+ 
   // init
   loadAvailable();
 </script>
 </body>
 </html>
+ 
