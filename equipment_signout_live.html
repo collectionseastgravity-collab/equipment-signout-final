@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Pasco County Utilities — Equipment Sign-Out</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700;900&family=Roboto:wght@400;500;600&display=swap');
+
+  :root {
+    --dark: #0d1f0f; --forest: #1a3a1e; --pine: #245228; --moss: #2e6b33;
+    --green: #3a8c40; --leaf: #4caf50; --mint: #66bb6a; --lime-acc: #8bc34a;
+    --gold: #c8a94a; --gold-lt: #f0d080; --offwhite: #f3f7f2; --surface: #ffffff;
+    --surface2: #e8f2e8; --border: #b8d4b8; --text: #0d1f0f; --muted: #4a6b4d;
+    --red: #c62828; --red-bg: #ffebee;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--offwhite); color: var(--text); font-family: 'Roboto', sans-serif; min-height: 100vh; padding-bottom: 110px; }
+
+  header { background: linear-gradient(160deg, var(--dark) 0%, var(--forest) 50%, var(--pine) 100%); position: sticky; top: 0; z-index: 100; box-shadow: 0 3px 16px rgba(0,0,0,0.35); }
+  .header-stripe { height: 4px; background: linear-gradient(90deg, var(--gold) 0%, var(--lime-acc) 50%, var(--gold) 100%); }
+  .header-top { display: flex; align-items: center; gap: 12px; padding: 14px 14px 12px; }
+  .header-text { flex: 1; }
+  .header-dept { font-family: 'Roboto Condensed', sans-serif; font-size: 9px; font-weight: 700; color: var(--gold-lt); text-transform: uppercase; letter-spacing: 2.5px; display: block; margin-bottom: 2px; }
+  .header-title { font-family: 'Roboto Condensed', sans-serif; font-size: 22px; font-weight: 900; color: #fff; text-transform: uppercase; letter-spacing: 0.5px; line-height: 1.1; }
+  .header-sub { font-size: 11px; color: var(--mint); font-weight: 500; letter-spacing: 0.3px; margin-top: 3px; display: flex; align-items: center; gap: 5px; }
+  .header-sub::before { content: ''; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--lime-acc); }
+
+  /* MODE TOGGLE */
+  .mode-toggle { display: flex; margin: 14px 12px 0; background: var(--surface2); border-radius: 10px; padding: 4px; border: 1px solid var(--border); }
+  .mode-btn { flex: 1; text-align: center; padding: 10px; border: none; background: transparent; border-radius: 7px; font-family: 'Roboto Condensed', sans-serif; font-weight: 700; font-size: 13px; letter-spacing: 0.5px; text-transform: uppercase; color: var(--muted); cursor: pointer; transition: all 0.15s; }
+  .mode-btn.active { background: linear-gradient(135deg, var(--pine), var(--moss)); color: #fff; box-shadow: 0 2px 6px rgba(26,58,30,0.3); }
+
+  .card { margin: 14px 12px 10px; background: var(--surface); border-radius: 10px; border: 1px solid var(--border); overflow: hidden; box-shadow: 0 1px 5px rgba(0,0,0,0.07); }
+  .sh-bar { background: linear-gradient(90deg, var(--pine), var(--moss)); padding: 9px 14px; display: flex; align-items: center; gap: 8px; border-bottom: 2px solid var(--gold); }
+  .sh-bar .sh-icon { font-size: 15px; line-height: 1; }
+  .sh-bar .sh-title { font-family: 'Roboto Condensed', sans-serif; font-size: 12px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 1.5px; }
+
+  .card-body { padding: 14px; }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+  .field-row.single { grid-template-columns: 1fr; }
+  .field-row:last-child { margin-bottom: 0; }
+  .field-wrap { display: flex; flex-direction: column; gap: 5px; }
+  .field-wrap label { font-size: 10px; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; }
+  .field-wrap label .note { font-weight: 400; text-transform: none; letter-spacing: 0; color: var(--muted); opacity: 0.8; }
+  .field-wrap input, .field-wrap select, .field-wrap textarea {
+    background: var(--offwhite); border: 1.5px solid var(--border); border-radius: 7px; color: var(--text);
+    font-family: 'Roboto', sans-serif; font-size: 15px; padding: 10px 12px; width: 100%; outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s; -webkit-appearance: none; appearance: none;
+  }
+  .field-wrap select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%234a6b4d' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 12px center; padding-right: 34px;
+  }
+  .field-wrap textarea { min-height: 90px; resize: vertical; font-size: 14px; }
+  .field-wrap input:focus, .field-wrap select:focus, .field-wrap textarea:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(58,140,64,0.14); }
+  .field-hint { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  .footer { position: fixed; bottom: 0; left: 0; right: 0; background: linear-gradient(0deg, var(--offwhite) 70%, transparent); padding: 12px 12px 18px; z-index: 200; }
+  .submit-btn {
+    width: 100%; padding: 15px; background: linear-gradient(135deg, var(--pine), var(--moss), var(--green));
+    border: none; border-radius: 10px; color: #fff; cursor: pointer; font-family: 'Roboto Condensed', sans-serif;
+    font-size: 18px; font-weight: 900; letter-spacing: 1px; text-transform: uppercase;
+    transition: transform 0.15s, opacity 0.15s; -webkit-tap-highlight-color: transparent;
+    box-shadow: 0 3px 14px rgba(26,58,30,0.4); border-top: 2px solid var(--gold);
+  }
+  .submit-btn:disabled { opacity: 0.6; }
+  .submit-btn:active:not(:disabled) { transform: scale(0.98); opacity: 0.9; }
+  .submit-hint { text-align: center; font-size: 11px; color: var(--muted); margin-top: 7px; }
+
+  #success-screen { display: none; position: fixed; inset: 0; background: var(--surface); z-index: 999; align-items: center; justify-content: center; flex-direction: column; text-align: center; padding: 28px; }
+  #success-screen.show { display: flex; }
+  .success-wordmark { background: linear-gradient(135deg, var(--pine), var(--moss)); border-radius: 12px; padding: 14px 22px; margin-bottom: 20px; text-align: center; border-bottom: 3px solid var(--gold); animation: pop 0.5s cubic-bezier(0.34,1.56,0.64,1); box-shadow: 0 3px 14px rgba(26,58,30,0.25); }
+  .sw-county { font-family: 'Roboto Condensed', sans-serif; font-size: 10px; font-weight: 700; color: var(--gold-lt); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 3px; }
+  .sw-dept { font-family: 'Roboto Condensed', sans-serif; font-size: 16px; font-weight: 900; color: #fff; text-transform: uppercase; letter-spacing: 0.5px; }
+  @keyframes pop { from { transform: scale(0.4); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  .success-check { width: 68px; height: 68px; background: #e8f5e9; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 34px; margin-bottom: 14px; animation: pop 0.45s 0.1s cubic-bezier(0.34,1.56,0.64,1) both; }
+  .success-title { font-family: 'Roboto Condensed', sans-serif; font-size: 24px; font-weight: 900; color: var(--pine); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+  .success-msg { color: var(--muted); font-size: 14px; line-height: 1.5; max-width: 280px; margin: 0 auto 14px; }
+  .reset-btn { background: linear-gradient(135deg, var(--pine), var(--moss)); border: none; border-radius: 9px; color: #fff; cursor: pointer; font-family: 'Roboto Condensed', sans-serif; font-size: 16px; font-weight: 700; padding: 13px 28px; text-transform: uppercase; letter-spacing: 1px; }
+
+  .error-banner { margin: 0 12px; padding: 10px 14px; background: var(--red-bg); border: 1px solid var(--red); color: var(--red); border-radius: 8px; font-size: 13px; display: none; }
+  .error-banner.show { display: block; }
+
+  .loading-note { text-align: center; font-size: 12px; color: var(--muted); padding: 6px 0; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-stripe"></div>
+  <div class="header-top">
+    <div class="header-text">
+      <span class="header-dept">Pasco County</span>
+      <div class="header-title">Utilities Operations &amp; Maintenance</div>
+      <div class="header-sub" id="modeLabel">Equipment Sign-Out Sheet</div>
+    </div>
+  </div>
+</header>
+
+<div class="mode-toggle">
+  <button class="mode-btn active" id="btnSignOut" onclick="setMode('signout')">Sign Out</button>
+  <button class="mode-btn" id="btnReturn" onclick="setMode('return')">Return</button>
+</div>
+
+<div class="error-banner" id="errorBanner"></div>
+
+<!-- SIGN OUT VIEW -->
+<div id="view-signout">
+  <div class="card">
+    <div class="sh-bar"><span class="sh-icon">👤</span><span class="sh-title">Driver &amp; Staff Info</span></div>
+    <div class="card-body">
+      <div class="field-row single">
+        <div class="field-wrap">
+          <label>Driver Name</label>
+          <select id="driverName">
+            <option value="">— Select Driver —</option>
+            <option>Patrick Rhodes</option><option>Kenny Riggs</option><option>Johnathan Sheeks</option>
+            <option>Patrick Bonse</option><option>Greg Lamar</option><option>Randy Horrine</option>
+            <option>Ethan Nash</option><option>Nicholas Rios</option><option>Roberto Brenes</option>
+            <option>Eric Perrine</option><option>Miles Darnall</option><option>Matthew Manning</option>
+            <option>Jon Senkus</option><option>Cody Nolan</option><option>Dominic Passante</option>
+            <option>Kendall Matthews</option><option>Michael Nolting</option>
+          </select>
+        </div>
+      </div>
+      <div class="field-row single">
+        <div class="field-wrap"><label>Sign-Out Date &amp; Time</label><input type="datetime-local" id="signoutDate"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="sh-bar"><span class="sh-icon">🛠️</span><span class="sh-title">Equipment Selection</span></div>
+    <div class="card-body">
+      <div class="field-row single">
+        <div class="field-wrap">
+          <label>Primary Vehicle / Unit #</label>
+          <select id="vehicleNum"><option value="">— Loading available units… —</option></select>
+          <div class="field-hint" id="availCount"></div>
+        </div>
+      </div>
+      <div class="field-row single">
+        <div class="field-wrap"><label>Other Equipment # <span class="note">(trailer, excavator, etc.)</span></label><input type="text" id="otherEquip" placeholder="e.g., T-102, E-405"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px">
+    <div class="sh-bar"><span class="sh-icon">📝</span><span class="sh-title">Additional Notes / Issues</span></div>
+    <div class="card-body"><textarea id="notes" placeholder="Enter details or specify issues here…"></textarea></div>
+  </div>
+</div>
+
+<!-- RETURN VIEW -->
+<div id="view-return" style="display:none">
+  <div class="card">
+    <div class="sh-bar"><span class="sh-icon">↩️</span><span class="sh-title">Return Equipment</span></div>
+    <div class="card-body">
+      <div class="field-row single">
+        <div class="field-wrap">
+          <label>Vehicle / Unit # Being Returned</label>
+          <select id="returnVehicleNum"><option value="">— Loading signed-out units… —</option></select>
+        </div>
+      </div>
+      <div class="field-row single">
+        <div class="field-wrap"><label>Returned By</label><input type="text" id="returnDriver" placeholder="Driver name"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card" style="margin-bottom:14px">
+    <div class="sh-bar"><span class="sh-icon">📝</span><span class="sh-title">Return Notes / Condition</span></div>
+    <div class="card-body"><textarea id="returnNotes" placeholder="Any issues, damage, or notes on return…"></textarea></div>
+  </div>
+</div>
+
+<div class="footer">
+  <button class="submit-btn" id="submitBtn" onclick="submitForm()">⬆ Submit Sign-Out Report</button>
+  <div class="submit-hint" id="submitHint">Synced live to the equipment tracker</div>
+</div>
+
+<div id="success-screen">
+  <div class="success-wordmark"><div class="sw-county">Pasco County</div><div class="sw-dept">Utilities Operations &amp; Maintenance</div></div>
+  <div class="success-check">✅</div>
+  <div class="success-title" id="successTitle">Sign-Out Submitted!</div>
+  <div class="success-msg" id="successMsg">Your equipment sign-out has been recorded.</div>
+  <button class="reset-btn" onclick="resetForm()">Done</button>
+</div>
+
+<script>
+  // ⚠️ Replace with your deployed Cloudflare Worker URL (no trailing slash)
+  const WORKER_URL = "https://equipment-signout-worker.collectionseastgravity.workers.dev/";
+
+  let mode = "signout";
+
+  function setMode(m){
+    mode = m;
+    document.getElementById('btnSignOut').classList.toggle('active', m === 'signout');
+    document.getElementById('btnReturn').classList.toggle('active', m === 'return');
+    document.getElementById('view-signout').style.display = m === 'signout' ? 'block' : 'none';
+    document.getElementById('view-return').style.display = m === 'return' ? 'block' : 'none';
+    document.getElementById('modeLabel').textContent = m === 'signout' ? 'Equipment Sign-Out Sheet' : 'Equipment Return';
+    document.getElementById('submitBtn').textContent = m === 'signout' ? '⬆ Submit Sign-Out Report' : '↩ Submit Return';
+    hideError();
+    if (m === 'signout') loadAvailable(); else loadSignedOut();
+  }
+
+  function showError(msg){
+    const el = document.getElementById('errorBanner');
+    el.textContent = msg;
+    el.classList.add('show');
+  }
+  function hideError(){
+    document.getElementById('errorBanner').classList.remove('show');
+  }
+
+  async function loadAvailable(){
+    const sel = document.getElementById('vehicleNum');
+    sel.innerHTML = '<option value="">— Loading available units… —</option>';
+    try {
+      const res = await fetch(`${WORKER_URL}/available`);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to load units');
+      sel.innerHTML = '<option value="">— Select —</option>' +
+        data.vehicles.map(v => `<option>${v}</option>`).join('');
+      document.getElementById('availCount').textContent = `${data.vehicles.length} unit(s) currently available`;
+    } catch(e){
+      sel.innerHTML = '<option value="">— Could not load units —</option>';
+      showError('Could not load available units: ' + e.message);
+    }
+  }
+
+  async function loadSignedOut(){
+    const sel = document.getElementById('returnVehicleNum');
+    sel.innerHTML = '<option value="">— Loading signed-out units… —</option>';
+    try {
+      const res = await fetch(`${WORKER_URL}/signedout`);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to load units');
+      sel.innerHTML = '<option value="">— Select —</option>' +
+        data.vehicles.map(v => `<option>${v}</option>`).join('');
+    } catch(e){
+      sel.innerHTML = '<option value="">— Could not load units —</option>';
+      showError('Could not load signed-out units: ' + e.message);
+    }
+  }
+
+  async function submitForm(){
+    hideError();
+    const btn = document.getElementById('submitBtn');
+
+    if (mode === 'signout'){
+      const driver  = document.getElementById('driverName').value;
+      const date    = document.getElementById('signoutDate').value;
+      const vehicle = document.getElementById('vehicleNum').value;
+      const other   = document.getElementById('otherEquip').value.trim();
+      const notes   = document.getElementById('notes').value.trim();
+
+      if(!driver || !date || !vehicle){
+        showError('Please select a Driver, set the Sign-Out Date/Time, and select a Vehicle #.');
+        return;
+      }
+
+      btn.disabled = true; btn.textContent = 'Submitting…';
+      try {
+        const res = await fetch(`${WORKER_URL}/signout`, {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ driver, vehicle, otherEquipment: other, notes })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Submission failed');
+
+        document.getElementById('successTitle').textContent = 'Sign-Out Submitted!';
+        document.getElementById('successMsg').textContent = `${vehicle} is now marked Out to ${driver}.`;
+        document.getElementById('success-screen').classList.add('show');
+      } catch(e){
+        showError(e.message);
+      } finally {
+        btn.disabled = false; btn.textContent = '⬆ Submit Sign-Out Report';
+      }
+
+    } else {
+      const vehicle = document.getElementById('returnVehicleNum').value;
+      const driver  = document.getElementById('returnDriver').value.trim();
+      const notes   = document.getElementById('returnNotes').value.trim();
+
+      if(!vehicle){
+        showError('Please select which vehicle is being returned.');
+        return;
+      }
+
+      btn.disabled = true; btn.textContent = 'Submitting…';
+      try {
+        const res = await fetch(`${WORKER_URL}/return`, {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ vehicle, driver, notes })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Submission failed');
+
+        document.getElementById('successTitle').textContent = 'Return Recorded!';
+        document.getElementById('successMsg').textContent = `${vehicle} is now marked Available.`;
+        document.getElementById('success-screen').classList.add('show');
+      } catch(e){
+        showError(e.message);
+      } finally {
+        btn.disabled = false; btn.textContent = '↩ Submit Return';
+      }
+    }
+  }
+
+  function resetForm(){
+    document.getElementById('success-screen').classList.remove('show');
+    document.getElementById('driverName').value = '';
+    document.getElementById('otherEquip').value = '';
+    document.getElementById('notes').value = '';
+    document.getElementById('signoutDate').value = '';
+    document.getElementById('returnDriver').value = '';
+    document.getElementById('returnNotes').value = '';
+    setMode(mode); // reload live lists
+  }
+
+  // init
+  loadAvailable();
+</script>
+</body>
+</html>
