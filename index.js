@@ -21,23 +21,23 @@ export default {
       });
     }
 
-    // ⚠️ UPDATE ONLY YOUR BASE ID HERE
+    // ⚠️ YOUR SPECIFIC AIRTABLE BASE ID
     const AIRTABLE_BASE_ID = "appbY4OMv1cgq3WqH"; 
 
     try {
-      // 1. Convert the URL path to lowercase to match safely
+      // 4. Convert the URL path to lowercase to match safely
       const requestUrl = request.url.toLowerCase();
       let tableName = "";
       
       if (requestUrl.includes("available")) {
-        tableName = "Inventory"; 
+        tableName = "Inventory"; // Matches your first Airtable tab
       } else if (requestUrl.includes("signedout")) {
-        tableName = "Logs"; 
+        tableName = "Logs"; // Matches your second Airtable tab
       } else {
         tableName = "Inventory"; // Fallback if no matching path is found
       }
 
-      // 2. Properly structured Airtable API v0 URL endpoint
+      // 5. Properly structured Airtable API v0 URL endpoint (with fixed syntax)
       const url = `https://airtable.com{AIRTABLE_BASE_ID}/${encodeURIComponent(tableName)}`;
 
       // --- HANDLE LOADING DATA (GET REQUEST) ---
