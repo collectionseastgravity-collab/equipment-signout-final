@@ -22,11 +22,20 @@ export default {
     }
 
     // ⚠️ UPDATE THESE CONFIGURATIONS TO MATCH YOUR AIRTABLE SETUP
-    const AIRTABLE_BASE_ID = "appR74xXbVcqxglh4"; 
-    const AIRTABLE_TABLE_NAME = "Equipment Tracking"; // Case sensitive (e.g., "Inventory" or "Units")
+const AIRTABLE_BASE_ID = "appbY4OMv1cgq3WqH"; 
 
     try {
-      const url = `https://airtable.com{AIRTABLE_BASE_ID}/${encodeURIComponent(AIRTABLE_TABLE_NAME)}`;
+      // 1. Figure out which table to use based on the path requested by your HTML
+      let tableName = "";
+      if (request.url.includes("/available")) {
+        tableName = "Inventory"; // Matches your first tab exactly
+      } else if (request.url.includes("/signedout")) {
+        tableName = "Logs"; // Matches your second tab exactly
+      } else {
+        tableName = "Inventory"; // Fallback tab name
+      }
+
+      const url = `https://airtable.com{AIRTABLE_BASE_ID}/${encodeURIComponent(tableName)}`;
 
       // --- HANDLE LOADING DATA (GET REQUEST) ---
       if (request.method === "GET") {
