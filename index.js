@@ -35,7 +35,7 @@ const AIRTABLE_BASE_ID = "appbY4OMv1cgq3WqH";
         tableName = "Inventory"; // Fallback tab name
       }
 
-      const url = `https://airtable.com{AIRTABLE_BASE_ID}/${encodeURIComponent(tableName)}`;
+      url = `https://airtable.com{AIRTABLE_BASE_ID}/${encodeURIComponent(tableName)}`;
 
       // --- HANDLE LOADING DATA (GET REQUEST) ---
       if (request.method === "GET") {
