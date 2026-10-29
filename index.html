@@ -101,6 +101,7 @@
 <div class="mode-toggle">
   <button class="mode-btn active" id="btnSignOut" onclick="setMode('signout')">Sign Out</button>
   <button class="mode-btn" id="btnReturn" onclick="setMode('return')">Return</button>
+  <button class="mode-btn" id="btnFleet" onclick="setMode('fleet')">Fleet</button>
 </div>
  
 <div class="error-banner" id="errorBanner"></div>
@@ -165,6 +166,30 @@
     <div class="card-body"><textarea id="returnNotes" placeholder="Any issues, damage, or notes on return…"></textarea></div>
   </div>
 </div>
+
+<!-- FLEET VIEW (drop off at / back from fleet; status only, no driver or notes) -->
+<div id="view-fleet" style="display:none">
+  <div class="card" style="margin-bottom:14px">
+    <div class="sh-bar"><span class="sh-icon">🔧</span><span class="sh-title" id="fleetTitle">Drop Off at Fleet</span></div>
+    <div class="card-body">
+      <div class="field-row single">
+        <div class="field-wrap">
+          <label>What are you doing?</label>
+          <div class="mode-toggle" style="margin:4px 0 0">
+            <button class="mode-btn active" id="fbSend" onclick="setFleetDir('send')">Drop off at fleet</button>
+            <button class="mode-btn" id="fbBack" onclick="setFleetDir('back')">Back from fleet</button>
+          </div>
+        </div>
+      </div>
+      <div class="field-row single">
+        <div class="field-wrap">
+          <label id="fleetLabel">Vehicle / Unit # Going to Fleet</label>
+          <select id="fleetVehicle"><option value="">— Select —</option></select>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
  
 <div class="footer">
   <button class="submit-btn" id="submitBtn" onclick="submitForm()">⬆ Submit Sign-Out Report</button>
@@ -182,19 +207,39 @@
 <script>
   // ⚠️ Replace with your deployed Cloudflare Worker URL (no trailing slash)
   const WORKER_URL = "https://equipment-signout-api.collectionseastgravity.workers.dev";
+  const FORM_KEY = "Hzh8oVUGdKJczbOvjSRot4K4";
  
   let mode = "signout";
- 
+  let fleetDir = "send"; // fleet mode: 'send' = drop off at fleet, 'back' = back from fleet
+
   function setMode(m){
     mode = m;
     document.getElementById('btnSignOut').classList.toggle('active', m === 'signout');
     document.getElementById('btnReturn').classList.toggle('active', m === 'return');
+    document.getElementById('btnFleet').classList.toggle('active', m === 'fleet');
     document.getElementById('view-signout').style.display = m === 'signout' ? 'block' : 'none';
     document.getElementById('view-return').style.display = m === 'return' ? 'block' : 'none';
+    document.getElementById('view-fleet').style.display = m === 'fleet' ? 'block' : 'none';
+    if (m === 'fleet'){ setFleetDir(fleetDir); return; }
     document.getElementById('modeLabel').textContent = m === 'signout' ? 'Equipment Sign-Out Sheet' : 'Equipment Return';
     document.getElementById('submitBtn').textContent = m === 'signout' ? '⬆ Submit Sign-Out Report' : '↩ Submit Return';
     hideError();
     if (m === 'signout') loadAvailable(); else loadSignedOut();
+  }
+
+  function fleetBtnText(){ return fleetDir === 'send' ? '🔧 Submit Drop-Off' : '✔ Submit Back from Fleet'; }
+
+  function setFleetDir(d){
+    fleetDir = d;
+    const send = d === 'send';
+    document.getElementById('fbSend').classList.toggle('active', send);
+    document.getElementById('fbBack').classList.toggle('active', !send);
+    document.getElementById('modeLabel').textContent = 'Fleet Drop-Off / Pick-Up';
+    document.getElementById('fleetTitle').textContent = send ? 'Drop Off at Fleet' : 'Back from Fleet';
+    document.getElementById('fleetLabel').textContent = send ? 'Vehicle / Unit # Going to Fleet' : 'Vehicle / Unit # Coming Back from Fleet';
+    document.getElementById('submitBtn').textContent = fleetBtnText();
+    hideError();
+    loadFleetList();
   }
  
   function showError(msg){
@@ -205,7 +250,14 @@
   function hideError(){
     document.getElementById('errorBanner').classList.remove('show');
   }
- 
+
+  // trucks in number order first, then everything else (the gas meters) A–Z at the bottom
+  function sortUnits(list){
+    const isTruck = v => /^V-\d+$/.test(v);
+    return list.slice().sort((a, b) =>
+      (isTruck(b) - isTruck(a)) || a.localeCompare(b, undefined, {numeric: true}));
+  }
+
   async function loadAvailable(){
     const sel = document.getElementById('vehicleNum');
     sel.innerHTML = '<option value="">— Loading available units… —</option>';
@@ -214,7 +266,7 @@
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to load units');
       sel.innerHTML = '<option value="">— Select —</option>' +
-        data.vehicles.map(v => `<option>${v}</option>`).join('');
+        sortUnits(data.vehicles).map(v => `<option>${v}</option>`).join('');
       document.getElementById('availCount').textContent = `${data.vehicles.length} unit(s) currently available`;
     } catch(e){
       sel.innerHTML = '<option value="">— Could not load units —</option>';
@@ -230,13 +282,30 @@
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to load units');
       sel.innerHTML = '<option value="">— Select —</option>' +
-        data.vehicles.map(v => `<option>${v}</option>`).join('');
+        sortUnits(data.vehicles).map(v => `<option>${v}</option>`).join('');
     } catch(e){
       sel.innerHTML = '<option value="">— Could not load units —</option>';
       showError('Could not load signed-out units: ' + e.message);
     }
   }
- 
+
+  // send: units that are Available (/available); back: units that are At Fleet (/atfleet)
+  async function loadFleetList(){
+    const sel = document.getElementById('fleetVehicle');
+    const send = fleetDir === 'send';
+    sel.innerHTML = '<option value="">— Loading units… —</option>';
+    try {
+      const res = await fetch(`${WORKER_URL}/${send ? 'available' : 'atfleet'}`);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to load units');
+      sel.innerHTML = '<option value="">— Select —</option>' +
+        sortUnits(data.vehicles).map(v => `<option>${v}</option>`).join('');
+    } catch(e){
+      sel.innerHTML = '<option value="">— Could not load units —</option>';
+      showError((send ? 'Could not load available units: ' : 'Could not load units at fleet: ') + e.message);
+    }
+  }
+
   async function submitForm(){
     hideError();
     const btn = document.getElementById('submitBtn');
@@ -258,7 +327,7 @@
         const res = await fetch(`${WORKER_URL}/signout`, {
           method: 'POST',
           headers: {'Content-Type':'application/json'},
-          body: JSON.stringify({ driver, vehicle, otherEquipment: other, notes })
+          body: JSON.stringify({ driver, vehicle, otherEquipment: other, notes, signoutDate: new Date(date).toISOString(), formKey: FORM_KEY })
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Submission failed');
@@ -272,6 +341,34 @@
         btn.disabled = false; btn.textContent = '⬆ Submit Sign-Out Report';
       }
  
+    } else if (mode === 'fleet'){
+      const vehicle = document.getElementById('fleetVehicle').value;
+      const send = fleetDir === 'send';
+
+      if(!vehicle){
+        showError(send ? 'Please select which vehicle is going to fleet.' : 'Please select which vehicle is coming back from fleet.');
+        return;
+      }
+
+      btn.disabled = true; btn.textContent = 'Submitting…';
+      try {
+        const res = await fetch(`${WORKER_URL}/fleet/${send ? 'send' : 'back'}`, {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ vehicle, formKey: FORM_KEY })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Submission failed');
+
+        document.getElementById('successTitle').textContent = send ? 'Dropped Off at Fleet!' : 'Back from Fleet!';
+        document.getElementById('successMsg').textContent = send ? `${vehicle} is now marked At Fleet.` : `${vehicle} is now marked Available.`;
+        document.getElementById('success-screen').classList.add('show');
+      } catch(e){
+        showError(e.message);
+      } finally {
+        btn.disabled = false; btn.textContent = fleetBtnText();
+      }
+
     } else {
       const vehicle = document.getElementById('returnVehicleNum').value;
       const driver  = document.getElementById('returnDriver').value.trim();
@@ -287,7 +384,7 @@
         const res = await fetch(`${WORKER_URL}/return`, {
           method: 'POST',
           headers: {'Content-Type':'application/json'},
-          body: JSON.stringify({ vehicle, driver, notes })
+          body: JSON.stringify({ vehicle, driver, notes, formKey: FORM_KEY })
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Submission failed');
