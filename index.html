@@ -187,6 +187,15 @@
           <select id="fleetVehicle"><option value="">— Select —</option></select>
         </div>
       </div>
+      <div class="field-row single">
+        <div class="field-wrap">
+          <label>Driver Name</label>
+          <input type="text" id="fleetDriver" placeholder="Enter your full name">
+        </div>
+      </div>
+      <div class="field-row single">
+        <div class="field-wrap"><label>Date</label><input type="date" id="fleetDate"></div>
+      </div>
     </div>
   </div>
 </div>
@@ -229,6 +238,16 @@
 
   function fleetBtnText(){ return fleetDir === 'send' ? '🔧 Submit Drop-Off' : '✔ Submit Back from Fleet'; }
 
+  // local calendar day as YYYY-MM-DD (never toISOString().slice(0,10): that is the UTC day)
+  function localToday(){
+    const d = new Date(), p = n => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+  }
+  function resetFleetDate(){
+    const el = document.getElementById('fleetDate');
+    el.value = el.max = localToday();
+  }
+
   function setFleetDir(d){
     fleetDir = d;
     const send = d === 'send';
@@ -238,6 +257,7 @@
     document.getElementById('fleetTitle').textContent = send ? 'Drop Off at Fleet' : 'Back from Fleet';
     document.getElementById('fleetLabel').textContent = send ? 'Vehicle / Unit # Going to Fleet' : 'Vehicle / Unit # Coming Back from Fleet';
     document.getElementById('submitBtn').textContent = fleetBtnText();
+    resetFleetDate();
     hideError();
     loadFleetList();
   }
@@ -349,13 +369,23 @@
         showError(send ? 'Please select which vehicle is going to fleet.' : 'Please select which vehicle is coming back from fleet.');
         return;
       }
+      const driver = document.getElementById('fleetDriver').value.trim();
+      const day    = document.getElementById('fleetDate').value;
+      const today  = localToday();
+      if(!driver){ showError('Please enter your name.'); return; }
+      if(!day){ showError('Please set the date.'); return; }
+      if(day > today){ showError('The date cannot be in the future.'); return; }
+      // today: the moment of submit; an earlier day: local noon of that day (never new Date('YYYY-MM-DD'), which is UTC midnight)
+      let fleetDate;
+      if (day === today) fleetDate = new Date().toISOString();
+      else { const [y, m, d] = day.split('-').map(Number); fleetDate = new Date(y, m - 1, d, 12, 0, 0).toISOString(); }
 
       btn.disabled = true; btn.textContent = 'Submitting…';
       try {
         const res = await fetch(`${WORKER_URL}/fleet/${send ? 'send' : 'back'}`, {
           method: 'POST',
           headers: {'Content-Type':'application/json'},
-          body: JSON.stringify({ vehicle, formKey: FORM_KEY })
+          body: JSON.stringify({ vehicle, driver, fleetDate, formKey: FORM_KEY })
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Submission failed');
@@ -408,6 +438,8 @@
     document.getElementById('signoutDate').value = '';
     document.getElementById('returnDriver').value = '';
     document.getElementById('returnNotes').value = '';
+    document.getElementById('fleetDriver').value = '';
+    resetFleetDate();
     setMode(mode); // reload live lists
   }
  
